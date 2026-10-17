@@ -1,0 +1,8 @@
+{
+  "appId": "app.grimorio.universal",
+  "appName": "Grimório Universal",
+  "webDir": "Grimorio_Site_HD",
+  "server": {
+    "androidScheme": "https"
+  }
+}
