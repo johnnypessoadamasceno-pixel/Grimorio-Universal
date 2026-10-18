@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>Grimório Universal — D&D 2024 e Tormenta20</title>
+<link rel="icon" href="icone.svg" type="image/svg+xml">
+<style>
+*{box-sizing:border-box}body{min-height:100vh;margin:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 30%,#302447,#111525 65%,#060914);color:#eeeaf7;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;text-align:center}.card{max-width:460px;padding:36px 22px}h1{font-size:2rem;margin:12px 0 4px;color:#f1e9ff}.sub{color:#bfb7d1;margin-top:0}.sign{font-size:65px;filter:drop-shadow(0 0 14px #628aff)}progress{appearance:none;width:min(340px,85vw);height:7px;border:0;border-radius:9px;background:#37354d}progress::-webkit-progress-bar{border-radius:9px;background:#37354d}progress::-webkit-progress-value{border-radius:9px;background:linear-gradient(90deg,#8f72c6,#67ccf3)}p{line-height:1.6}.hint{font-size:12px;color:#9c92b5}.error{color:#ffc5cc;white-space:pre-wrap}</style>
+</head>
+<body>
+<main class="card" id="loading">
+<div class="sign">📖</div><h1>Grimório Universal</h1>
+<p class="sub">D&D 2024 · Tormenta20</p>
+<p id="status">Preparando seu grimório...</p>
+<progress id="progress" value="0" max="11"></progress>
+<p class="hint">Primeiro acesso: carregando os dados e as ilustrações em HD.</p>
+</main>
+<script>
+(async () => {
+  const status=document.getElementById('status');
+  const bar=document.getElementById('progress');
+  const paths=["pacote/parte-00.txt","pacote/parte-01.txt","pacote/parte-02.txt","pacote/parte-03.txt","pacote/parte-04.txt","pacote/parte-05.txt","pacote/parte-06.txt","pacote/parte-07.txt","pacote/parte-08.txt","pacote/parte-09.txt","pacote/parte-10.txt"];
+  try {
+    const parts=[];
+    for(let i=0;i<paths.length;i++){
+      const resp=await fetch(paths[i],{cache:'force-cache'});
+      if(!resp.ok)throw Error('Não foi possível carregar '+paths[i]+' ('+resp.status+')');
+      const part=await resp.text();
+      parts.push(part.trim());
+      bar.value=i+1;status.textContent='Carregando ilustrações e sistemas: '+Math.round((i+1)/paths.length*100)+'%';
+    }
+    status.textContent='Abrindo os sistemas de RPG...';
+    if(typeof DecompressionStream==='undefined')throw Error('Atualize seu navegador para abrir o Grimório (suporte a gzip).');
+    const bytes=Uint8Array.from(atob(parts.join('')),c=>c.charCodeAt(0));
+    const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+    const source=await new Response(stream).text();
+    if(!source.toLowerCase().includes('<html'))throw Error('Conteúdo inválido do Grimório');
+    document.open();document.write(source);document.close();
+  }catch(e){
+    status.className='error';
+    status.textContent='Falha ao abrir o Grimório: '+String(e.message||e)+'\nRecarregue a página. Se persistir, envie o erro ao responsável.';
+    bar.style.display='none';
+  }
+})();
+</script>
+</body>
+</html>
